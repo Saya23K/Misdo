@@ -26,13 +26,17 @@
                                             限定
                                         @endif
                                     </td>
+                                    
                                     <td rowspan = "2">
+                                        <a href="{{route('products.edit', $product->id)}}">
                                         @if(isset( $product->img_path ))
                                         <img src="{{ secure_asset('storage/product_img/' . $product->img_path ) }}" width="150" height="150">
                                         @else
                                         <img src="{{ secure_asset('storage/image/no_image.jpg') }}" width="150" height="150">
                                         @endif
+                                        </a>
                                     </td>
+                                    
                                     <td>
                                         {{ $product->name }}
                                     </td>

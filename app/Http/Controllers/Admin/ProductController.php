@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 use App\Models\Product;
 use App\Models\Genre;
@@ -26,7 +27,7 @@ class ProductController extends Controller
         
         // dd($genres);
         
-         return view('admin.product.index', compact('products', 'genres'));
+         return view('admin.product.index', compact('genres'));
     }
 
     /**
@@ -84,7 +85,7 @@ class ProductController extends Controller
         // 連続登録時にジャンルを選択しておきたいので$genre_idに値を入れてcompactで新規登録画面に飛ばす
         $genre_id = $puroduct->genre_id;
         
-        return redirect('admin/product/create')->with(compact('genre_id'));
+        return redirect('admin/products/create')->with(compact('genre_id'));
     }
 
     /**
@@ -107,7 +108,16 @@ class ProductController extends Controller
     public function edit($id)
     {
         //編集するページ
-        return view('admin.product.edit');
+        // 指定したIDのレコードを取得
+        $product = Product::find($id);
+        
+        // ジャンルをGenreModelから参照
+        $genres = Genre::all();
+    
+        // 区分をTypeModelから参照
+        $types = Type::all();
+        
+        return view('admin.product.edit', compact('product', 'genres', 'types'));
     }
 
     /**
@@ -120,6 +130,29 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         //編集したものを更新するシステム
+        $this->validate($request, Product::$rules);
+        $product = Product::find($id);
+        $revise = $request->all();
+        
+        // 画像削除のチェック入っているときにimg_path要素をnull
+        if($request->remove == 'true'){
+            $revise['img_path'] = null;
+            Storage::disk('public')->delete('product_img/'. $product->img_path);
+        // 画像送信されてきたら画像を保存
+        }elseif($request->file('image')) {
+            $path = $request->file('image')->store('public/product_img');
+            $revise['img_path'] = basename($path);
+            Storage::disk('public')->delete('product_img/'. $product->img_path);
+        }
+        
+        unset($revise['image']);
+        unset($revise['remove']);
+        unset($revise['_token']);
+        
+        $product->fill($revise)->save();
+        
+        return redirect('admin/products');
+    
     }
 
     /**

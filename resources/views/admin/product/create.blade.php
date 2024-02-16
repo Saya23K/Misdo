@@ -30,10 +30,11 @@
                             <div>
                                 <select name="genre_id">
                                     @foreach ($genres as $genre)
-                                        @if({{ $genre_id }}==={{ $genre=>id }})
+                                        @if(isset($genre_id) and $genre_id === $genre->id)
                                         <option value="{{ $genre->id }}" selected>{{ $genre->genre }}</option>
                                         @else
                                         <option value="{{ $genre->id }}">{{ $genre->genre }}</option>
+                                        @endif
                                     @endforeach
                                 </select>
                                 <a href="{{ route('genres.create') }}">⇒ジャンル追加</a>
