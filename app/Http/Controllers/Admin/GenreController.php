@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\Genre;
+use App\Models\Product;
+use App\Models\Type;
+
 
 class GenreController extends Controller
 {
@@ -17,10 +20,27 @@ class GenreController extends Controller
     public function index()
     {
         //ジャンル一覧
+        $limits = Genre::withWhereHas('products', function ($query) {
+        $query->where('type_id', '!=', '3');
+        })->where('type_id', '=', '1')->get();
         
-        $genres = Genre::all();
+        $regulars = Genre::withWhereHas('products', function ($query) {
+        $query->where('type_id', '!=', '3');
+        })->where('type_id', '=', '2')->get();
         
-        return view('admin.genre.index' , ['genres'=>$genres]);
+        // ジャンルごと販売終了
+        $discontinuations = Genre::withWhereHas('products', function ($query) {
+        $query->where('type_id', '=', '3');
+        })->where('type_id', '=', '3')->get();
+        
+        // 特定商品のみ販売終了
+        $endofsales = Genre::withWhereHas('products', function ($query) {
+        $query->where('type_id', '=', '3');
+        })->where('type_id', '!=', '3')->get();
+        
+        // dd($endofsales);
+        
+        return view('admin.genre.index' , compact('limits', 'regulars', 'discontinuations', 'endofsales'));
     }
 
     /**
@@ -31,7 +51,11 @@ class GenreController extends Controller
     public function create()
     {
         //ジャンルを追加するページ
-        return view('admin.genre.create');
+        
+        // 区分をTypeModelから参照
+        $types = Type::all();
+        
+        return view('admin.genre.create', compact('types'));
     }
 
     /**
@@ -68,7 +92,11 @@ class GenreController extends Controller
      */
     public function show($id)
     {
-        //
+        //ジャンルごとの一覧ページ
+        $genre = Genre::with('products')->find($id);
+        
+        return view('admin.genre.show', compact('genre'));
+        
     }
 
     /**
@@ -80,7 +108,12 @@ class GenreController extends Controller
     public function edit($id)
     {
         //編集するページ
-        return view('admin.genre.edit');
+        //指定したIDのレコードを取得
+        $genre = Genre::find($id);
+        $types = Type::all();
+        
+        
+        return view('admin.genre.edit', compact('genre', 'types'));
     }
 
     /**
@@ -92,7 +125,27 @@ class GenreController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //編集を更新するシステム
+        // 編集を更新するシステム
+        $this->validate($request, Genre::$rules);
+        $genre = Genre::with('products')->find($id);
+        $revise = $request->all();
+        
+        // dd($genre->products);
+        
+        // 販売終了が選択されたらproductのtype_idも3(販売終了)にする
+        if($request->type_id == 3){
+            foreach($genre->products as $product){
+                $product->type_id = '3';
+                $product->save();
+            }
+        }
+        
+        unset($revise['_token']);
+        
+        $genre->fill($revise)->save();
+        
+        return redirect('admin/genres');
+        
     }
 
     /**

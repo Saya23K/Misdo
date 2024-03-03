@@ -25,8 +25,6 @@ class ProductController extends Controller
         
         $genres = Genre::with('products')->get();
         
-        // dd($genres);
-        
          return view('admin.product.index', compact('genres'));
     }
 
@@ -82,8 +80,10 @@ class ProductController extends Controller
         $product->fill($form);
         $product->save();
         
-        // 連続登録時にジャンルを選択しておきたいので$genre_idに値を入れてcompactで新規登録画面に飛ばす
-        $genre_id = $puroduct->genre_id;
+        // 連続登録時にジャンルを選択しておきたいので$genre_idに値を入れて新規登録画面に飛ばす
+        $genre_id = $product->genre_id;
+        
+        // dd($genre_id);
         
         return redirect('admin/products/create')->with(compact('genre_id'));
     }
@@ -107,7 +107,7 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        //編集するページ
+        // 編集するページ
         // 指定したIDのレコードを取得
         $product = Product::find($id);
         
@@ -164,5 +164,12 @@ class ProductController extends Controller
     public function destroy($id)
     {
         //削除するシステム
+        $product = Product::find($id);
+        if($product->img_path){
+            Storage::disk('public')->delete('product_img/'. $product->img_path);
+        }
+        $product->delete();
+        
+        return redirect('admin/products');
     }
 }

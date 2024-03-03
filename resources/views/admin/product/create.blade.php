@@ -30,7 +30,7 @@
                             <div>
                                 <select name="genre_id">
                                     @foreach ($genres as $genre)
-                                        @if(isset($genre_id) and $genre_id === $genre->id)
+                                        @if(session('genre_id') and session('genre_id') == $genre->id)
                                         <option value="{{ $genre->id }}" selected>{{ $genre->genre }}</option>
                                         @else
                                         <option value="{{ $genre->id }}">{{ $genre->genre }}</option>
@@ -46,11 +46,11 @@
                                 ◆タイプ選択
                             </div>
                             @foreach ($types as $type)
-                                <!--初期値をレギュラー商品に（id=2）-->
-                                @if ($type->id===2)
-                                    <input type="radio" name="type_id" value="{{ $type->id }}" checked>{{ $type->type }}商品
+                                <!--初期値をレギュラー商品に（id=1）-->
+                                @if ($type->id===1)
+                                    <input type="radio" name="type_id" value="{{ $type->id }}" checked>{{ $type->type }}
                                 @else
-                                    <input type="radio" name="type_id" value="{{ $type->id }}">{{ $type->type }}商品
+                                    <input type="radio" name="type_id" value="{{ $type->id }}">{{ $type->type }}
                                 @endif
                             @endforeach
                         </div>       

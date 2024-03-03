@@ -76,8 +76,16 @@
                         </div>
                         
                     </div>
-                    
-                    <input type="submit" value="登録">
+                    <input type="submit" class="btn btn-primary" value="更新">
+                </form>
+                
+                <form action="{{ route('products.destroy', $product->id) }}" method="post">
+                 @csrf
+                 @method('DELETE')
+                    <button type="submit" class="btn btn-danger" onclick='return confirm("削除しますか？");'>
+                        削除
+                    </button>
+                </form>
                 
             </div>
         </div>

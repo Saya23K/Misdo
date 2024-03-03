@@ -23,6 +23,18 @@
                     @endif
                     
                     <div>
+                        ◆タイプ選択
+                    </div>
+                    @foreach ($types as $type)
+                        <!--初期値を期間限定商品に（id=1）-->
+                        @if ($type->id===1)
+                            <input type="radio" name="type_id" value="{{ $type->id }}" checked>{{ $type->type }}
+                        @else
+                            <input type="radio" name="type_id" value="{{ $type->id }}">{{ $type->type }}
+                        @endif
+                    @endforeach
+                    
+                    <div>
                         <input type="text" name="genre" placeholder="ジャンル入力(全角)">
                     </div>
                     

@@ -14,4 +14,9 @@ class Type extends Model
         return $this->hasMany(Product::class);
     }
     
+    public function genres()
+    {
+        return $this->hasMany(Genre::class);
+    }
+    
 }

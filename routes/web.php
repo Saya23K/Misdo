@@ -26,11 +26,11 @@ Route::middleware('auth')->prefix('admin')->group(function () {
      });
         
      Route::resource('products', ProductController::class)->except([
-        'show', 'destroy' //showは除く
+        'show' //showは除く
      ]);
         
      Route::resource('genres', GenreController::class)->except([
-        'show', 'destroy' //showは除く
+        'destroy' //showは除く
      ]);
 });
 
